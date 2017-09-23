@@ -17,9 +17,11 @@
 
   http://www.arduino.cc/en/Tutorial/SerialEvent
 */
+// problema : al \r y al \n son caracteres especiales que al momento de querer comparar no da el resultado deseado. 
 
 String inputString = "";         // a String to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
+const String  parada = "/r#/n";
 
 void setup() {
   // initialize serial:
@@ -51,9 +53,50 @@ void serialEvent() {
     inputString += inChar;
     // if the incoming character is a newline, set a flag so the main loop can
     // do something about it:
-    //stop : “\r#\n”.
-    if (inChar == '\n') {
+
+    //otra forma de parar con la concatenacion.
+    //usando un meth de la libreria String
+    //lo que hace es decir si la cadena termina 
+    //con determinado patron.
+    //if(inputString.endsWith(parada)){
+      //stringComplete = true;
+    //}
+    if( string_maching(inputString,parada) == parada.length()){
+      inputString = inputString.substring(0,inputString.length()-parada.length());
       stringComplete = true;
     }
   }
 }
+
+void mostrar(String msg){
+  Serial.println(msg);  
+}
+
+/**
+ * Algoritmo String Maching 
+  este algoritmo indica si cierto patron aparece en el texto.
+  @param texto y patron
+  @return retorna un entero que si es igual al tamanio de la 
+  patron quiere decir que existe el patron en el texto.
+*/
+int string_maching(String texto,String patron){
+    int contador = 0;
+     if(texto.length()<patron.length())
+      return 0;
+    else
+      for (int i = 0; i < texto.length(); i++) {
+        String nuevo = texto.substring(i, texto.length());
+        for (int j = 0; j < patron.length(); j++) {
+          if(nuevo.charAt(j)==patron.charAt(j))
+            contador++;
+          else{
+            contador = 0;
+            break;
+          }
+          if(contador==patron.length())
+            return contador;
+        }
+      }
+    return contador;
+ }
+  
