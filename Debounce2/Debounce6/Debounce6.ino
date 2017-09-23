@@ -30,30 +30,25 @@
 // constants won't change. They're used here to set pin numbers:
 const int buttonPin = 2;    // the number of the pushbutton pin
 const int ledPin = 4;       // the number of the LED pin
-const int ledPin1 = 13;
-const int ledPin2 = 8;
 
 // Variables will change:
 int ledState = HIGH;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
+String serial = "";
 
 // the following variables are unsigned longs because the time, measured in
 // milliseconds, will quickly become a bigger number than can be stored in an int.
 unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
-unsigned long debounceDelay = 100;    // the debounce time; increase if the output flickers
+unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 int contador = 0;
 
 void setup() {
   Serial.begin(9600);
   pinMode(buttonPin, INPUT);
   pinMode(ledPin, OUTPUT);
-  pinMode(ledPin1,OUTPUT);
-  pinMode(ledPin2,OUTPUT);
   // set initial LED state
-  digitalWrite(ledPin,ledState);
-  digitalWrite(ledPin1,!ledState);
-  digitalWrite(ledPin2,!ledState);
+  digitalWrite(ledPin,!ledState);
 }
 
 void loop() {
@@ -63,8 +58,8 @@ void loop() {
   // check to see if you just pressed the button
   // (i.e. the input went from LOW to HIGH), and you've waited long enough
   // since the last press to ignore any noise:
-  String ver = String(reading,DEC);
-  view("Estado leido del pin 2 : "+ver);
+  //String ver = String(reading,DEC);
+  //view("Estado leido del pin 2 : "+ver);
   // If the switch changed, due to noise or pressing:
   if (reading != lastButtonState) {
     // reset the debouncing timer
@@ -87,14 +82,28 @@ void loop() {
   }
 
   // set the LED:
-  digitalWrite(ledPin, ledState);
-  digitalWrite(ledPin1, !ledState);
-  digitalWrite(ledPin2, !ledState);
-  
+  if(ledState==HIGH && serial.equals("HIGH")){
+      view("---->"+serial);
+      digitalWrite(ledPin, ledState);
+      serial = ""; 
+  }
+  else    
+      digitalWrite(ledPin, LOW);
+      
   // save the reading. Next time through the loop, it'll be the lastButtonState:
   lastButtonState = reading;
 }
 
 void view(String msg){
     Serial.println(msg);  
+}
+
+void serialEvent() {
+  view("msg -> "+ serial);
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    serial += inChar;
+  }
 }
