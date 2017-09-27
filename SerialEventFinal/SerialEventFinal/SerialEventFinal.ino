@@ -1,4 +1,5 @@
 /*
+  Este sketch fue modificado para utilizar el patron \r#\n para parar.
   Serial Event example
 
   When new serial data arrives, this sketch adds it to a String.
